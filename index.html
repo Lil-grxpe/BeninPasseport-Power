@@ -162,12 +162,10 @@
       if (lieux.length) {
         html += '<div class="sp-section-title">Lieux emblematiques</div><ul class="sp-lieux">';
         lieux.forEach(function(l, i) {
-          var nm  = typeof l === 'object' ? l.name : l;
-          var url = typeof l === 'object' ? l.url  : '#';
+          var nm = typeof l === 'object' ? l.name : l;
           html += '<li class="sp-lieu">';
           html += '<span class="sp-lieu-icon">' + ICONS[i % ICONS.length] + '</span>';
-          html += '<a class="sp-lieu-link" href="' + url + '" target="_blank" rel="noopener">' + nm + '</a>';
-          html += '<span class="sp-lieu-arrow">&#x2197;</span></li>';
+          html += '<span class="sp-lieu-name">' + nm + '</span></li>';
         });
         html += '</ul>';
       }
