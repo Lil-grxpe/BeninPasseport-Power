@@ -3,120 +3,92 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Passeport Béninois — Carte de Liberté de Voyage</title>
-  <meta name="description" content="Carte interactive 3D des pays accessibles aux citoyens béninois sans visa." />
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌍</text></svg>" />
+  <title>Passeport Beninois - Carte de Liberte</title>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --bg: #030816; --text: #fff; --text-dim: #8892a8;
-      --accent: #00ffaa; --accent-glow: rgba(0,255,170,0.35);
-      --gold: #ffaa00; --gold-glow: rgba(255,170,0,0.4);
-      --dark-poly: rgba(18,25,45,0.7);
-      --glass-bg: rgba(8,14,30,0.65); --glass-border: rgba(255,255,255,0.08);
-      --pink: #ff4da6;
-    }
-    * { box-sizing:border-box; margin:0; padding:0; }
-    body { font-family:'Outfit',sans-serif; background:var(--bg); color:var(--text); overflow:hidden; width:100vw; height:100vh; }
-    #app { position:relative; width:100%; height:100%; }
-    #globeViz { position:absolute; inset:0; z-index:1; }
-
-    /* Loading */
-    .loading-screen { position:fixed; inset:0; z-index:100; background:var(--bg); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2rem; transition:opacity .8s,visibility .8s; }
-    .loading-screen.hidden { opacity:0; visibility:hidden; }
-    .loading-title { font-size:2rem; font-weight:800; text-transform:uppercase; letter-spacing:2px; }
-    .loading-title span { color:var(--accent); }
-    .spinner { width:48px; height:48px; border:3px solid var(--glass-border); border-top-color:var(--accent); border-radius:50%; animation:spin .9s linear infinite; }
-    @keyframes spin { to{transform:rotate(360deg)} }
-
-    /* Overlay */
-    .overlay { position:absolute; inset:0; z-index:10; pointer-events:none; padding:2rem; }
-    .overlay>* { pointer-events:auto; }
-    .glass { background:var(--glass-bg); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:1px solid var(--glass-border); border-radius:16px; padding:1.5rem; box-shadow:0 8px 32px rgba(0,0,0,.4); }
-
-    .header { max-width:460px; animation:fadeInDown .8s ease-out; }
-    .header h1 { font-size:clamp(1.8rem,5vw,3.5rem); font-weight:800; line-height:1.05; text-transform:uppercase; letter-spacing:-1px; }
-    .header h1 span { color:var(--accent); text-shadow:0 0 24px var(--accent-glow); }
-    .header .sub { margin-top:.6rem; font-size:.95rem; color:var(--text-dim); font-weight:300; line-height:1.5; }
-
-    .stats { position:absolute; top:2rem; right:2rem; text-align:right; animation:fadeInRight .8s ease-out .4s backwards; }
-    .stat-value { font-size:4.5rem; font-weight:800; line-height:1; color:var(--accent); text-shadow:0 0 30px var(--accent-glow); }
-    .stat-label { font-size:.9rem; text-transform:uppercase; letter-spacing:3px; font-weight:600; margin-top:.3rem; }
-    .stat-sub { margin-top:.5rem; font-size:.8rem; color:var(--text-dim); }
-
-    .legend { position:absolute; bottom:2rem; left:2rem; width:330px; animation:fadeInLeft .8s ease-out .6s backwards; }
-    .legend h3 { font-size:1.1rem; font-weight:600; margin-bottom:1rem; }
-    .legend ul { list-style:none; display:flex; flex-direction:column; gap:1rem; }
-    .legend li { display:flex; align-items:flex-start; gap:.8rem; }
-    .dot { width:14px; height:14px; border-radius:50%; flex-shrink:0; margin-top:3px; }
-    .dot.free { background:var(--accent); box-shadow:0 0 10px var(--accent-glow); }
-    .dot.home { background:var(--gold); box-shadow:0 0 10px var(--gold-glow); }
-    .dot.req { background:var(--dark-poly); border:1px solid var(--glass-border); }
-    .legend li strong { display:block; font-size:.9rem; margin-bottom:2px; }
-    .legend li p { font-size:.75rem; color:var(--text-dim); line-height:1.3; }
-
-    /* Hover info */
-    .info-panel { position:absolute; bottom:2rem; right:2rem; width:280px; text-align:center; opacity:0; transform:translateY(10px); transition:opacity .3s,transform .3s; }
-    .info-panel.visible { opacity:1; transform:translateY(0); }
-    .info-country { font-size:1.5rem; font-weight:800; margin-bottom:.4rem; }
-    .info-status { display:inline-flex; align-items:center; gap:8px; font-size:.9rem; font-weight:600; padding:6px 16px; border-radius:20px; }
-    .info-status .sdot { width:8px; height:8px; border-radius:50%; }
-    .info-status.s-free { color:var(--accent); background:rgba(0,255,170,.1); }
-    .info-status.s-free .sdot { background:var(--accent); }
-    .info-status.s-home { color:var(--gold); background:rgba(255,170,0,.1); }
-    .info-status.s-home .sdot { background:var(--gold); }
-    .info-status.s-req { color:var(--text-dim); background:rgba(255,255,255,.05); }
-    .info-status.s-req .sdot { background:var(--text-dim); }
-
-    /* ── Side Panel ── */
-    .side-panel { position:fixed; top:0; right:-440px; width:420px; height:100vh; z-index:50; background:linear-gradient(180deg,rgba(5,10,30,0.97),rgba(3,8,22,0.99)); border-left:1px solid rgba(0,255,170,0.15); transition:right .45s cubic-bezier(.4,0,.2,1); overflow-y:auto; box-shadow:-12px 0 50px rgba(0,0,0,.7); }
-    .side-panel.open { right:0; }
-    .side-panel::-webkit-scrollbar { width:5px; }
-    .side-panel::-webkit-scrollbar-thumb { background:var(--accent); border-radius:3px; }
-
-    .sp-hero { position:relative; width:100%; height:240px; overflow:hidden; }
-    .sp-hero img { width:100%; height:100%; object-fit:cover; }
-    .sp-hero-overlay { position:absolute; inset:0; background:linear-gradient(transparent 40%,rgba(5,10,30,0.95)); }
-    .sp-hero-name { position:absolute; bottom:1.2rem; left:1.5rem; font-size:2rem; font-weight:800; text-shadow:0 2px 12px rgba(0,0,0,.8); }
-    .sp-close { position:absolute; top:1rem; right:1rem; background:rgba(0,0,0,.5); backdrop-filter:blur(8px); border:1px solid rgba(255,255,255,.15); color:#fff; width:38px; height:38px; border-radius:50%; font-size:1.4rem; cursor:pointer; transition:all .3s; display:flex; align-items:center; justify-content:center; }
-    .sp-close:hover { background:rgba(255,255,255,.2); transform:scale(1.1); }
-    .sp-no-img { width:100%; height:240px; background:linear-gradient(135deg,#0a1628,#132040); display:flex; align-items:center; justify-content:center; font-size:4rem; }
-
-    .sp-body { padding:1.5rem 1.8rem 2.5rem; }
-    .sp-badge { display:inline-flex; align-items:center; gap:6px; font-size:.85rem; font-weight:600; padding:5px 14px; border-radius:16px; margin-bottom:1.5rem; }
-    .sp-badge.b-free { color:var(--accent); background:rgba(0,255,170,.12); border:1px solid rgba(0,255,170,.2); }
-    .sp-badge.b-home { color:var(--gold); background:rgba(255,170,0,.12); border:1px solid rgba(255,170,0,.2); }
-    .sp-badge.b-req { color:var(--text-dim); background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); }
-    .sp-badge .bdot { width:7px; height:7px; border-radius:50%; }
-    .sp-badge.b-free .bdot { background:var(--accent); box-shadow:0 0 6px var(--accent-glow); }
-    .sp-badge.b-home .bdot { background:var(--gold); }
-    .sp-badge.b-req .bdot { background:var(--text-dim); }
-
-    .sp-section-title { font-size:.8rem; text-transform:uppercase; letter-spacing:3px; color:var(--accent); font-weight:600; margin-bottom:1rem; display:flex; align-items:center; gap:.5rem; }
-    .sp-section-title::after { content:''; flex:1; height:1px; background:linear-gradient(to right,rgba(0,255,170,.3),transparent); }
-
-    .sp-lieux { list-style:none; display:flex; flex-direction:column; gap:.8rem; margin-bottom:2rem; }
-    .sp-lieu { display:flex; align-items:center; gap:1rem; padding:.8rem 1rem; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.06); border-radius:12px; transition:all .3s; }
-    .sp-lieu:hover { background:rgba(0,255,170,.06); border-color:rgba(0,255,170,.2); transform:translateX(4px); }
-    .sp-lieu-icon { font-size:1.4rem; flex-shrink:0; }
-    .sp-lieu-name { font-size:1rem; font-weight:600; }
-
-    /* Hidden msg */
-    .hmsg { margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid rgba(255,255,255,.05); text-align:center; cursor:pointer; user-select:none; }
-    .hmsg .teaser { font-size:.8rem; color:var(--text-dim); opacity:.3; transition:all .4s; }
-    .hmsg:hover .teaser { opacity:.8; color:var(--accent); }
-    .hmsg .reveal { display:none; margin-top:.8rem; font-size:1.05rem; color:var(--pink); font-weight:600; padding:1.2rem; background:rgba(255,77,166,.08); border-radius:12px; border:1px dashed rgba(255,77,166,.3); line-height:1.5; animation:fadeInDown .4s ease; }
-    .hmsg.on .teaser { display:none; }
-    .hmsg.on .reveal { display:block; }
-
-    @keyframes fadeInDown { from{opacity:0;transform:translateY(-20px)} to{opacity:1;transform:translateY(0)} }
-    @keyframes fadeInLeft { from{opacity:0;transform:translateX(-24px)} to{opacity:1;transform:translateX(0)} }
-    @keyframes fadeInRight { from{opacity:0;transform:translateX(24px)} to{opacity:1;transform:translateX(0)} }
-
-    @media(max-width:768px) {
-      .overlay{padding:1.2rem} .legend{width:260px;bottom:1.2rem;left:1.2rem}
-      .stats{top:auto;bottom:1.2rem;right:1.2rem} .stat-value{font-size:2.8rem}
-      .info-panel{display:none} .side-panel{width:100%;right:-100%}
+    :root{--bg:#030816;--text:#fff;--text-dim:#8892a8;--accent:#00ffaa;--accent-glow:rgba(0,255,170,0.35);--gold:#ffaa00;--gold-glow:rgba(255,170,0,0.4);--glass-bg:rgba(8,14,30,0.65);--glass-border:rgba(255,255,255,0.08);--pink:#ff4da6}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--text);overflow:hidden;width:100vw;height:100vh}
+    #app{position:relative;width:100%;height:100%}
+    #globeViz{position:absolute;inset:0;z-index:1}
+    .loading-screen{position:fixed;inset:0;z-index:100;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2rem;transition:opacity .8s,visibility .8s}
+    .loading-screen.hidden{opacity:0;visibility:hidden}
+    .loading-title{font-size:2rem;font-weight:800;text-transform:uppercase;letter-spacing:2px}
+    .loading-title span{color:var(--accent)}
+    .spinner{width:48px;height:48px;border:3px solid var(--glass-border);border-top-color:var(--accent);border-radius:50%;animation:spin .9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .overlay{position:absolute;inset:0;z-index:10;pointer-events:none;padding:2rem}
+    .overlay>*{pointer-events:auto}
+    .glass{background:var(--glass-bg);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid var(--glass-border);border-radius:16px;padding:1.5rem;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+    .header{max-width:460px;animation:fadeInDown .8s ease-out}
+    .header h1{font-size:clamp(1.8rem,5vw,3.5rem);font-weight:800;line-height:1.05;text-transform:uppercase;letter-spacing:-1px}
+    .header h1 span{color:var(--accent);text-shadow:0 0 24px var(--accent-glow)}
+    .header .sub{margin-top:.6rem;font-size:.95rem;color:var(--text-dim);font-weight:300}
+    .stats{position:absolute;top:2rem;right:2rem;text-align:right;animation:fadeInRight .8s ease-out .4s backwards}
+    .stat-value{font-size:4.5rem;font-weight:800;line-height:1;color:var(--accent);text-shadow:0 0 30px var(--accent-glow)}
+    .stat-label{font-size:.9rem;text-transform:uppercase;letter-spacing:3px;font-weight:600;margin-top:.3rem}
+    .stat-sub{margin-top:.5rem;font-size:.8rem;color:var(--text-dim)}
+    .legend{position:absolute;bottom:2rem;left:2rem;width:310px;animation:fadeInLeft .8s ease-out .6s backwards}
+    .legend h3{font-size:1.1rem;font-weight:600;margin-bottom:1rem}
+    .legend ul{list-style:none;display:flex;flex-direction:column;gap:1rem}
+    .legend li{display:flex;align-items:flex-start;gap:.8rem}
+    .dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;margin-top:3px}
+    .dot.free{background:var(--accent);box-shadow:0 0 10px var(--accent-glow)}
+    .dot.home{background:var(--gold);box-shadow:0 0 10px var(--gold-glow)}
+    .dot.req{background:rgba(18,25,45,0.7);border:1px solid var(--glass-border)}
+    .legend li strong{display:block;font-size:.9rem;margin-bottom:2px}
+    .legend li p{font-size:.75rem;color:var(--text-dim);line-height:1.3}
+    .info-panel{position:absolute;bottom:2rem;right:2rem;width:280px;text-align:center;opacity:0;transform:translateY(10px);transition:opacity .3s,transform .3s}
+    .info-panel.visible{opacity:1;transform:translateY(0)}
+    .info-country{font-size:1.5rem;font-weight:800;margin-bottom:.4rem}
+    .info-status{display:inline-flex;align-items:center;gap:8px;font-size:.9rem;font-weight:600;padding:6px 16px;border-radius:20px}
+    .info-status .sdot{width:8px;height:8px;border-radius:50%}
+    .info-status.s-free{color:var(--accent);background:rgba(0,255,170,.1)}
+    .info-status.s-free .sdot{background:var(--accent)}
+    .info-status.s-home{color:var(--gold);background:rgba(255,170,0,.1)}
+    .info-status.s-home .sdot{background:var(--gold)}
+    .info-status.s-req{color:var(--text-dim);background:rgba(255,255,255,.05)}
+    .info-status.s-req .sdot{background:var(--text-dim)}
+    .side-panel{position:fixed;top:0;right:-440px;width:420px;height:100vh;z-index:50;background:linear-gradient(180deg,rgba(5,10,30,0.97),rgba(3,8,22,0.99));border-left:1px solid rgba(0,255,170,0.15);transition:right .45s cubic-bezier(.4,0,.2,1);overflow-y:auto;box-shadow:-12px 0 50px rgba(0,0,0,.7)}
+    .side-panel.open{right:0}
+    .side-panel::-webkit-scrollbar{width:5px}
+    .side-panel::-webkit-scrollbar-thumb{background:var(--accent);border-radius:3px}
+    .sp-header{position:relative;width:100%;min-height:110px;background:linear-gradient(135deg,#091628 0%,#0e2545 60%,#061318 100%);border-bottom:1px solid rgba(0,255,170,0.12);display:flex;align-items:flex-end;padding:1.4rem 1.8rem}
+    .sp-header-name{font-size:2rem;font-weight:800;letter-spacing:-1px}
+    .sp-close{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.15);color:#fff;width:36px;height:36px;border-radius:50%;font-size:1.3rem;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center}
+    .sp-close:hover{background:rgba(255,255,255,.18);transform:scale(1.1)}
+    .sp-body{padding:1.5rem 1.8rem 2.5rem}
+    .sp-badge{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:600;padding:5px 14px;border-radius:16px;margin-bottom:1.5rem}
+    .sp-badge.b-free{color:var(--accent);background:rgba(0,255,170,.12);border:1px solid rgba(0,255,170,.2)}
+    .sp-badge.b-home{color:var(--gold);background:rgba(255,170,0,.12);border:1px solid rgba(255,170,0,.2)}
+    .sp-badge.b-req{color:var(--text-dim);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1)}
+    .sp-badge .bdot{width:7px;height:7px;border-radius:50%}
+    .sp-badge.b-free .bdot{background:var(--accent)}
+    .sp-badge.b-home .bdot{background:var(--gold)}
+    .sp-badge.b-req .bdot{background:var(--text-dim)}
+    .sp-section-title{font-size:.78rem;text-transform:uppercase;letter-spacing:3px;color:var(--accent);font-weight:600;margin-bottom:1rem;display:flex;align-items:center;gap:.5rem}
+    .sp-section-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(0,255,170,.3),transparent)}
+    .sp-lieux{list-style:none;display:flex;flex-direction:column;gap:.7rem;margin-bottom:2rem}
+    .sp-lieu{display:flex;align-items:center;gap:1rem;padding:.85rem 1rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:12px;transition:all .25s}
+    .sp-lieu:hover{background:rgba(0,255,170,.06);border-color:rgba(0,255,170,.25);transform:translateX(5px)}
+    .sp-lieu-icon{font-size:1.3rem;flex-shrink:0}
+    .sp-lieu-link{font-size:.98rem;font-weight:600;color:var(--text);text-decoration:none;flex:1;transition:color .2s}
+    .sp-lieu-link:hover{color:var(--accent)}
+    .sp-lieu-arrow{font-size:.8rem;color:var(--accent);opacity:0;transition:opacity .2s}
+    .sp-lieu:hover .sp-lieu-arrow{opacity:1}
+    .hmsg{margin-top:1.5rem;padding-top:1.5rem;border-top:1px solid rgba(255,255,255,.05);text-align:center;cursor:pointer;user-select:none}
+    .hmsg .teaser{font-size:.8rem;color:var(--text-dim);opacity:.3;transition:all .4s}
+    .hmsg:hover .teaser{opacity:.8;color:var(--accent)}
+    .hmsg .reveal{display:none;margin-top:.8rem;font-size:1.05rem;color:var(--pink);font-weight:600;padding:1.2rem;background:rgba(255,77,166,.08);border-radius:12px;border:1px dashed rgba(255,77,166,.3);line-height:1.5;animation:fadeInDown .4s ease}
+    .hmsg.on .teaser{display:none}
+    .hmsg.on .reveal{display:block}
+    @keyframes fadeInDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes fadeInLeft{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:translateX(0)}}
+    @keyframes fadeInRight{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+    @media(max-width:768px){
+      .overlay{padding:1.2rem}.legend{width:260px;bottom:1.2rem;left:1.2rem}
+      .stats{top:auto;bottom:1.2rem;right:1.2rem}.stat-value{font-size:2.8rem}
+      .info-panel{display:none}.side-panel{width:100%;right:-100%}
     }
   </style>
 </head>
@@ -125,40 +97,37 @@
     <div class="loading-title">Chargement du <span>Globe</span></div>
     <div class="spinner"></div>
   </div>
-
   <div id="app">
     <div id="globeViz"></div>
     <div class="overlay">
-      <header class="header">
-        <h1>Passeport <span>Béninois</span></h1>
-        <p class="sub">Cliquez sur un pays pour découvrir ses lieux emblématiques 🌍</p>
+      <header class="header glass">
+        <h1>Passeport <span>Beninois</span></h1>
+        <p class="sub">Cliquez sur un pays pour explorer ses lieux &#x1F30D;</p>
       </header>
       <div class="stats glass" id="statsPanel">
         <div class="stat-value" id="statCount">0</div>
         <div class="stat-label">Destinations</div>
-        <div class="stat-sub">Accès libre ou visa à l'arrivée</div>
+        <div class="stat-sub">Acces libre ou visa a l'arrivee</div>
       </div>
       <div class="legend glass">
-        <h3>Légende</h3>
+        <h3>Legende</h3>
         <ul>
-          <li><span class="dot free"></span><div><strong>Accessible</strong><p>Sans visa ou visa à l'arrivée</p></div></li>
-          <li><span class="dot home"></span><div><strong>Bénin</strong><p>Votre point de départ</p></div></li>
-          <li><span class="dot req"></span><div><strong>Visa requis</strong><p>Démarches nécessaires</p></div></li>
+          <li><span class="dot free"></span><div><strong>Accessible</strong><p>Sans visa ou visa a l'arrivee</p></div></li>
+          <li><span class="dot home"></span><div><strong>Benin</strong><p>Votre point de depart</p></div></li>
+          <li><span class="dot req"></span><div><strong>Visa requis</strong><p>Demarches necessaires</p></div></li>
         </ul>
       </div>
       <div class="info-panel glass" id="infoPanel">
-        <div class="info-country" id="infoCountry">—</div>
+        <div class="info-country" id="infoCountry">-</div>
         <div class="info-status" id="infoStatus"><span class="sdot"></span><span class="stxt"></span></div>
       </div>
     </div>
-
     <div class="side-panel" id="sidePanel"></div>
   </div>
-
   <script src="https://unpkg.com/globe.gl@2.27.2/dist/globe.gl.min.js"></script>
   <script src="data.js"></script>
   <script>
-    const VISA_FREE = new Set([
+    var VISA_FREE = new Set([
       'BFA','CPV','CIV','GMB','GHA','GIN','GNB','LBR','MLI','NER','NGA','SEN','SLE','TGO',
       'AGO','BDI','CAF','TCD','COM','COG','COD','DJI','GNQ','ETH','GAB','KEN','LSO',
       'MDG','MWI','MRT','MUS','MOZ','NAM','RWA','STP','SYC','SOM','ZAF','TZA','UGA','ZMB','ZWE',
@@ -166,115 +135,104 @@
       'COK','FSM','KIR','NIU','PLW','WSM','TUV',
       'BHS','BRB','BLZ','BOL','DMA','ECU','HTI','NIC','VCT','SUR','TUN','OMN','PSE'
     ]);
-    const BENIN = 'BEN';
-    const TOTAL = VISA_FREE.size;
-    const C = { free:'#00ffaa', benin:'#ffaa00', req:'rgba(18,25,45,0.65)', border:'rgba(255,255,255,0.12)' };
-
-    const loadingEl = document.getElementById('loadingScreen');
-    const statCountEl = document.getElementById('statCount');
-    const infoPanel = document.getElementById('infoPanel');
-    const infoCountry = document.getElementById('infoCountry');
-    const infoStatus = document.getElementById('infoStatus');
-    const sidePanel = document.getElementById('sidePanel');
-
-    const LIEU_ICONS = ['📍','🏛️','🌊','⛰️','🏖️','🌴','🕌','🗿','🌋','🏔️'];
+    var BENIN = 'BEN';
+    var TOTAL = VISA_FREE.size;
+    var C = {free:'#00ffaa',benin:'#ffaa00',req:'rgba(18,25,45,0.65)',border:'rgba(255,255,255,0.12)'};
+    var loadingEl   = document.getElementById('loadingScreen');
+    var statCountEl = document.getElementById('statCount');
+    var infoPanel   = document.getElementById('infoPanel');
+    var infoCountry = document.getElementById('infoCountry');
+    var infoStatus  = document.getElementById('infoStatus');
+    var sidePanel   = document.getElementById('sidePanel');
+    var ICONS = ['&#x1F4CD;','&#x1F3DB;&#xFE0F;','&#x1F30A;','&#x26F0;&#xFE0F;','&#x1F3D6;&#xFE0F;','&#x1F334;','&#x1F54C;','&#x1F5FF;','&#x1F30B;','&#x1F3D4;&#xFE0F;'];
 
     function openPanel(iso, displayName) {
-      const d = COUNTRY_DATA[iso];
-      const name = d ? d.name : displayName;
-      const lieux = d ? d.lieux : [];
-      const img = d ? d.img : '';
-
-      let cls, txt;
-      if (iso === BENIN) { cls='b-home'; txt='🏠 Pays de départ'; }
-      else if (VISA_FREE.has(iso)) { cls='b-free'; txt='✅ Accessible sans visa'; }
-      else { cls='b-req'; txt='🔒 Visa requis'; }
-
-      let html = '<div class="sp-hero">';
-      if (img) {
-        html += `<img src="${img}" alt="${name}"><div class="sp-hero-overlay"></div>`;
-      } else {
-        html += `<div class="sp-no-img">🌍</div>`;
-      }
-      html += `<div class="sp-hero-name">${name}</div>`;
-      html += `<button class="sp-close" onclick="sidePanel.classList.remove('open')">&times;</button>`;
-      html += '</div>';
-
+      var d    = COUNTRY_DATA[iso];
+      var name = d ? d.name : displayName;
+      var lieux= d ? d.lieux : [];
+      var cls, txt;
+      if (iso === BENIN)           { cls='b-home'; txt='&#x1F3E0; Pays de depart'; }
+      else if (VISA_FREE.has(iso)) { cls='b-free'; txt='&#x2705; Accessible sans visa'; }
+      else                         { cls='b-req';  txt='&#x1F512; Visa requis'; }
+      var html = '<div class="sp-header">';
+      html += '<button class="sp-close" onclick="sidePanel.classList.remove('open')">&times;</button>';
+      html += '<div class="sp-header-name">' + name + '</div></div>';
       html += '<div class="sp-body">';
-      html += `<div class="sp-badge ${cls}"><span class="bdot"></span>${txt}</div>`;
-
+      html += '<div class="sp-badge ' + cls + '"><span class="bdot"></span>' + txt + '</div>';
       if (lieux.length) {
-        html += '<div class="sp-section-title">Lieux emblématiques</div>';
-        html += '<ul class="sp-lieux">';
-        lieux.forEach((l, i) => {
-          html += `<li class="sp-lieu"><span class="sp-lieu-icon">${LIEU_ICONS[i % LIEU_ICONS.length]}</span><span class="sp-lieu-name">${l}</span></li>`;
+        html += '<div class="sp-section-title">Lieux emblematiques</div><ul class="sp-lieux">';
+        lieux.forEach(function(l, i) {
+          var nm  = typeof l === 'object' ? l.name : l;
+          var url = typeof l === 'object' ? l.url  : '#';
+          html += '<li class="sp-lieu">';
+          html += '<span class="sp-lieu-icon">' + ICONS[i % ICONS.length] + '</span>';
+          html += '<a class="sp-lieu-link" href="' + url + '" target="_blank" rel="noopener">' + nm + '</a>';
+          html += '<span class="sp-lieu-arrow">&#x2197;</span></li>';
         });
         html += '</ul>';
       }
-
-      // Hidden message
-      html += `<div class="hmsg" onclick="this.classList.toggle('on')">`;
-      html += `<span class="teaser">🤫 Astuce voyageur (clique ici)</span>`;
-      html += `<span class="reveal">Oublie les Maldives et Singapour. La meilleure vue du monde, c'est toi au-dessus de moi. 😈</span>`;
-      html += `</div>`;
-
-      html += '</div>';
+      html += '<div class="hmsg" onclick="this.classList.toggle('on')">';
+      html += '<span class="teaser">&#x1F92B; Astuce voyageur (clique ici)</span>';
+      html += '<span class="reveal">Oublie les Maldives et Singapour. La meilleure vue du monde, c'est toi au-dessus de moi. &#x1F608;</span>';
+      html += '</div></div>';
       sidePanel.innerHTML = html;
       sidePanel.classList.add('open');
     }
 
     function animateCount(target, dur) {
-      const s = performance.now();
+      var s = performance.now();
       (function tick(now) {
-        const t = Math.min((now-s)/dur,1);
+        var t = Math.min((now-s)/dur,1);
         statCountEl.textContent = Math.round((1-Math.pow(1-t,3))*target);
-        if (t<1) requestAnimationFrame(tick);
+        if(t<1) requestAnimationFrame(tick);
       })(s);
     }
-
     function polyColor(f) {
-      const iso = f.properties.ISO_A3||f.properties.ISO_A3_EH;
+      var iso = f.properties.ISO_A3 || f.properties.ISO_A3_EH;
       return iso===BENIN ? C.benin : VISA_FREE.has(iso) ? C.free : C.req;
     }
-
-    const globe = Globe()
-      (document.getElementById('globeViz'))
+    var globe = Globe()(document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe@2.27.3/example/img/earth-dark.jpg')
       .bumpImageUrl('https://unpkg.com/three-globe@2.27.3/example/img/earth-topology.png')
       .backgroundImageUrl('https://unpkg.com/three-globe@2.27.3/example/img/night-sky.png')
       .showAtmosphere(true).atmosphereColor('#00ffaa').atmosphereAltitude(0.18)
       .polygonAltitude(0.012).polygonCapColor(polyColor)
-      .polygonSideColor(()=>'rgba(0,0,0,0.15)').polygonStrokeColor(()=>C.border)
-      .polygonLabel(()=>'')
-      .onPolygonHover(h => {
-        globe.polygonAltitude(d=>d===h?.06:.012)
-          .polygonCapColor(d=>{
-            if(d===h){const iso=d.properties.ISO_A3||d.properties.ISO_A3_EH; return iso===BENIN?'#ffd060':VISA_FREE.has(iso)?'#66ffcc':'rgba(40,50,80,.8)';}
+      .polygonSideColor(function(){return 'rgba(0,0,0,0.15)'})
+      .polygonStrokeColor(function(){return C.border})
+      .polygonLabel(function(){return ''})
+      .onPolygonHover(function(h) {
+        globe.polygonAltitude(function(d){return d===h?.06:.012})
+          .polygonCapColor(function(d){
+            if(d===h){var iso=d.properties.ISO_A3||d.properties.ISO_A3_EH;return iso===BENIN?'#ffd060':VISA_FREE.has(iso)?'#66ffcc':'rgba(40,50,80,.8)';}
             return polyColor(d);
           });
         if(h){
-          const p=h.properties, iso=p.ISO_A3||p.ISO_A3_EH, nm=p.NAME||p.ADMIN||'—';
+          var p=h.properties,iso=p.ISO_A3||p.ISO_A3_EH,nm=p.NAME||p.ADMIN||'-';
           infoCountry.textContent=nm;
-          let c,t; if(iso===BENIN){c='s-home';t='Pays de départ';}else if(VISA_FREE.has(iso)){c='s-free';t='Accessible';}else{c='s-req';t='Visa requis';}
-          infoStatus.className='info-status '+c; infoStatus.querySelector('.stxt').textContent=t; infoPanel.classList.add('visible');
+          var c,t;
+          if(iso===BENIN){c='s-home';t='Pays de depart';}
+          else if(VISA_FREE.has(iso)){c='s-free';t='Accessible';}
+          else{c='s-req';t='Visa requis';}
+          infoStatus.className='info-status '+c;
+          infoStatus.querySelector('.stxt').textContent=t;
+          infoPanel.classList.add('visible');
         } else { infoPanel.classList.remove('visible'); }
       })
-      .onPolygonClick(d => {
+      .onPolygonClick(function(d){
         if(!d) return;
-        const p=d.properties, iso=p.ISO_A3||p.ISO_A3_EH, nm=p.NAME||p.ADMIN||'—';
-        openPanel(iso, nm);
+        var p=d.properties,iso=p.ISO_A3||p.ISO_A3_EH,nm=p.NAME||p.ADMIN||'-';
+        openPanel(iso,nm);
       });
-
-    const ctrl = globe.controls();
-    ctrl.autoRotate=true; ctrl.autoRotateSpeed=0.4; ctrl.enableDamping=true; ctrl.dampingFactor=0.1;
-
+    var ctrl=globe.controls();
+    ctrl.autoRotate=true;ctrl.autoRotateSpeed=0.4;ctrl.enableDamping=true;ctrl.dampingFactor=0.1;
     fetch('https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_110m_admin_0_countries.geojson')
-      .then(r=>r.json()).then(data=>{
-        globe.polygonsData(data.features.filter(d=>(d.properties.ISO_A3||d.properties.ISO_A3_EH)!=='ATA'));
-        setTimeout(()=>{ loadingEl.classList.add('hidden'); animateCount(TOTAL,1400); globe.pointOfView({lat:9.3,lng:2.3,altitude:2.2},2500); },600);
-      }).catch(e=>{ loadingEl.innerHTML='<div style="color:#ff5555;font-size:1.2rem">Erreur de chargement.</div>'; });
-
-    window.addEventListener('resize',()=>{ globe.width(window.innerWidth); globe.height(window.innerHeight); });
+      .then(function(r){return r.json();})
+      .then(function(data){
+        globe.polygonsData(data.features.filter(function(d){return (d.properties.ISO_A3||d.properties.ISO_A3_EH)!=='ATA';}));
+        setTimeout(function(){loadingEl.classList.add('hidden');animateCount(TOTAL,1400);globe.pointOfView({lat:9.3,lng:2.3,altitude:2.2},2500);},600);
+      })
+      .catch(function(){loadingEl.innerHTML='<div style="color:#ff5555;font-size:1.2rem">Erreur de chargement.</div>';});
+    window.addEventListener('resize',function(){globe.width(window.innerWidth);globe.height(window.innerHeight);});
   </script>
 </body>
 </html>
