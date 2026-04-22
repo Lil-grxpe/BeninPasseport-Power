@@ -155,8 +155,8 @@
       else if (VISA_FREE.has(iso)) { cls='b-free'; txt='&#x2705; Accessible sans visa'; }
       else                         { cls='b-req';  txt='&#x1F512; Visa requis'; }
       var html = '<div class="sp-header">';
-      html += '<button class="sp-close" onclick="sidePanel.classList.remove('open')">&times;</button>';
-      html += '<div class="sp-header-name">' + name + '</div></div>';
+      html += `<button class="sp-close" onclick="sidePanel.classList.remove('open')">&times;</button>`;
+      html += `<div class="sp-header-name">${name}</div></div>`;
       html += '<div class="sp-body">';
       html += '<div class="sp-badge ' + cls + '"><span class="bdot"></span>' + txt + '</div>';
       if (lieux.length) {
@@ -169,10 +169,10 @@
         });
         html += '</ul>';
       }
-      html += '<div class="hmsg" onclick="this.classList.toggle('on')">';
-      html += '<span class="teaser">&#x1F92B; Astuce voyageur (clique ici)</span>';
-      html += '<span class="reveal">Oublie les Maldives et Singapour. La meilleure vue du monde, c'est toi au-dessus de moi. &#x1F608;</span>';
-      html += '</div></div>';
+      html += `<div class="hmsg" onclick="this.classList.toggle('on')">`;
+      html += `<span class="teaser">&#x1F92B; Astuce voyageur (clique ici)</span>`;
+      html += `<span class="reveal">Oublie les Maldives et Singapour. La meilleure vue du monde, c'est toi au-dessus de moi. &#x1F608;</span>`;
+      html += `</div></div>`;
       sidePanel.innerHTML = html;
       sidePanel.classList.add('open');
     }
