@@ -227,6 +227,84 @@
       to   { opacity: 1; transform: translateX(0); }
     }
 
+    /* ── Modal Destinations ── */
+    .destinations-modal {
+      position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(8px);
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.4s ease;
+      padding: 2rem;
+    }
+    .destinations-modal.active {
+      opacity: 1; pointer-events: auto;
+    }
+    .modal-content {
+      position: relative; width: 100%; max-width: 900px; max-height: 90vh;
+      overflow-y: auto; padding: 2.5rem; border-radius: 24px;
+      background: var(--glass-bg); border: 1px solid var(--glass-border);
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+    .modal-content::-webkit-scrollbar {
+      width: 8px;
+    }
+    .modal-content::-webkit-scrollbar-thumb {
+      background: var(--accent); border-radius: 4px;
+    }
+    .close-btn {
+      position: absolute; top: 1.5rem; right: 1.5rem;
+      background: rgba(255, 255, 255, 0.1); border: none;
+      color: white; width: 40px; height: 40px; border-radius: 50%;
+      font-size: 1.5rem; cursor: pointer; transition: background 0.3s;
+    }
+    .close-btn:hover { background: rgba(255, 255, 255, 0.2); }
+    .modal-content h2 {
+      font-size: 2.2rem; margin-bottom: 2rem; text-align: center;
+    }
+    .modal-content h2 span { color: var(--accent); }
+    
+    .dest-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 1.5rem;
+    }
+    .dest-card {
+      background: rgba(255, 255, 255, 0.03); border-radius: 16px; overflow: hidden;
+      border: 1px solid var(--glass-border); transition: transform 0.3s ease;
+    }
+    .dest-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+    .dest-card img { width: 100%; height: 180px; object-fit: cover; }
+    .dest-info { padding: 1.2rem; }
+    .dest-info h4 { font-size: 1.3rem; color: var(--gold); margin-bottom: 0.5rem; }
+    .dest-info p { font-size: 0.95rem; color: var(--text-dim); line-height: 1.4; }
+    .dest-info strong { color: white; }
+
+    .open-dest-btn {
+      position: absolute; bottom: 2rem; left: 50%; transform: translateX(-50%);
+      padding: 1rem 2rem; font-size: 1rem; font-weight: 600; color: white;
+      cursor: pointer; border-radius: 30px; transition: all 0.3s ease;
+      background: rgba(0, 255, 170, 0.1); border: 1px solid var(--accent);
+      backdrop-filter: blur(10px);
+      animation: fadeInDown 0.8s ease-out 1s backwards;
+    }
+    .open-dest-btn:hover {
+      background: var(--accent); color: black; box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    /* Message Caché */
+    .hidden-msg { margin-top: 3rem; text-align: center; cursor: pointer; user-select: none; }
+    .hidden-msg .teaser {
+      font-size: 0.9rem; color: var(--text-dim); opacity: 0.4; transition: opacity 0.3s;
+    }
+    .hidden-msg:hover .teaser { opacity: 1; color: var(--accent); }
+    .hidden-msg .actual-msg {
+      display: none; margin-top: 1rem; font-size: 1.15rem; color: #ff4da6;
+      font-weight: 600; padding: 1.5rem; background: rgba(255, 77, 166, 0.1);
+      border-radius: 12px; border: 1px dashed #ff4da6; animation: fadeIn 0.5s ease;
+      line-height: 1.5;
+    }
+    .hidden-msg.revealed .teaser { display: none; }
+    .hidden-msg.revealed .actual-msg { display: inline-block; }
+
     /* ── Responsive ── */
     @media (max-width: 768px) {
       .overlay { padding: 1.2rem; }
@@ -287,6 +365,641 @@
         <div class="info-status" id="infoStatus">
           <span class="sdot"></span>
           <span class="stxt"></span>
+        </div>
+      </div>
+      <!-- Open Modal Button -->
+      <button class="open-dest-btn" onclick="document.getElementById('destinationsModal').classList.add('active')">
+        Découvrir les Top Destinations 📸
+      </button>
+    </div>
+
+    <!-- Destinations Modal -->
+    <div class="destinations-modal" id="destinationsModal">
+      <div class="modal-content">
+        <button class="close-btn" onclick="document.getElementById('destinationsModal').classList.remove('active')">&times;</button>
+        <h2>Top Destinations <span>Sans Visa</span></h2>
+        <div class="dest-grid">
+
+          <div class="dest-card" data-iso="BFA">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Burkina Faso" loading="lazy">
+            <div class="dest-info">
+              <h4>Burkina Faso</h4>
+              <p>Découvrez Burkina Faso.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="CPV">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Cap-Vert" loading="lazy">
+            <div class="dest-info">
+              <h4>Cap-Vert</h4>
+              <p>Découvrez Cap-Vert.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="CIV">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Côte d'Ivoire" loading="lazy">
+            <div class="dest-info">
+              <h4>Côte d'Ivoire</h4>
+              <p>Découvrez Côte d'Ivoire.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="GMB">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Gambie" loading="lazy">
+            <div class="dest-info">
+              <h4>Gambie</h4>
+              <p>Découvrez Gambie.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="GHA">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Ghana" loading="lazy">
+            <div class="dest-info">
+              <h4>Ghana</h4>
+              <p>Découvrez Ghana.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="GIN">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Guinée" loading="lazy">
+            <div class="dest-info">
+              <h4>Guinée</h4>
+              <p>Découvrez Guinée.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="GNB">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Guinée-Bissau" loading="lazy">
+            <div class="dest-info">
+              <h4>Guinée-Bissau</h4>
+              <p>Découvrez Guinée-Bissau.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="LBR">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Liberia" loading="lazy">
+            <div class="dest-info">
+              <h4>Liberia</h4>
+              <p>Découvrez Liberia.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="MLI">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Mali" loading="lazy">
+            <div class="dest-info">
+              <h4>Mali</h4>
+              <p>Découvrez Mali.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="NER">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Niger" loading="lazy">
+            <div class="dest-info">
+              <h4>Niger</h4>
+              <p>Découvrez Niger.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="NGA">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Nigeria" loading="lazy">
+            <div class="dest-info">
+              <h4>Nigeria</h4>
+              <p>Découvrez Nigeria.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="SEN">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Sénégal" loading="lazy">
+            <div class="dest-info">
+              <h4>Sénégal</h4>
+              <p>Découvrez Sénégal.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="SLE">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Sierra Leone" loading="lazy">
+            <div class="dest-info">
+              <h4>Sierra Leone</h4>
+              <p>Découvrez Sierra Leone.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="TGO">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Togo" loading="lazy">
+            <div class="dest-info">
+              <h4>Togo</h4>
+              <p>Découvrez Togo.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="AGO">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Angola" loading="lazy">
+            <div class="dest-info">
+              <h4>Angola</h4>
+              <p>Découvrez Angola.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="BDI">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Burundi" loading="lazy">
+            <div class="dest-info">
+              <h4>Burundi</h4>
+              <p>Découvrez Burundi.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="CAF">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="République centrafricaine" loading="lazy">
+            <div class="dest-info">
+              <h4>République centrafricaine</h4>
+              <p>Découvrez République centrafricaine.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="TCD">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Tchad" loading="lazy">
+            <div class="dest-info">
+              <h4>Tchad</h4>
+              <p>Découvrez Tchad.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="COM">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Comores" loading="lazy">
+            <div class="dest-info">
+              <h4>Comores</h4>
+              <p>Découvrez Comores.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="COG">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="République du Congo" loading="lazy">
+            <div class="dest-info">
+              <h4>République du Congo</h4>
+              <p>Découvrez République du Congo.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="COD">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="République démocratique du Congo" loading="lazy">
+            <div class="dest-info">
+              <h4>République démocratique du Congo</h4>
+              <p>Découvrez République démocratique du Congo.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="DJI">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Djibouti" loading="lazy">
+            <div class="dest-info">
+              <h4>Djibouti</h4>
+              <p>Découvrez Djibouti.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="GNQ">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Guinée équatoriale" loading="lazy">
+            <div class="dest-info">
+              <h4>Guinée équatoriale</h4>
+              <p>Découvrez Guinée équatoriale.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="ETH">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Éthiopie" loading="lazy">
+            <div class="dest-info">
+              <h4>Éthiopie</h4>
+              <p>Découvrez Éthiopie.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="GAB">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Gabon" loading="lazy">
+            <div class="dest-info">
+              <h4>Gabon</h4>
+              <p>Découvrez Gabon.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="KEN">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Kenya" loading="lazy">
+            <div class="dest-info">
+              <h4>Kenya</h4>
+              <p>Découvrez Kenya.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="LSO">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Lesotho" loading="lazy">
+            <div class="dest-info">
+              <h4>Lesotho</h4>
+              <p>Découvrez Lesotho.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="MDG">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Madagascar" loading="lazy">
+            <div class="dest-info">
+              <h4>Madagascar</h4>
+              <p>Découvrez Madagascar.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="MWI">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Malawi" loading="lazy">
+            <div class="dest-info">
+              <h4>Malawi</h4>
+              <p>Découvrez Malawi.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="MRT">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Mauritanie" loading="lazy">
+            <div class="dest-info">
+              <h4>Mauritanie</h4>
+              <p>Découvrez Mauritanie.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="MUS">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Maurice" loading="lazy">
+            <div class="dest-info">
+              <h4>Maurice</h4>
+              <p>Découvrez Maurice.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="MOZ">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Mozambique" loading="lazy">
+            <div class="dest-info">
+              <h4>Mozambique</h4>
+              <p>Découvrez Mozambique.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="NAM">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Namibie" loading="lazy">
+            <div class="dest-info">
+              <h4>Namibie</h4>
+              <p>Découvrez Namibie.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="RWA">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Rwanda" loading="lazy">
+            <div class="dest-info">
+              <h4>Rwanda</h4>
+              <p>Découvrez Rwanda.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="STP">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Sao Tomé-et-Principe" loading="lazy">
+            <div class="dest-info">
+              <h4>Sao Tomé-et-Principe</h4>
+              <p>Découvrez Sao Tomé-et-Principe.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="SYC">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Seychelles" loading="lazy">
+            <div class="dest-info">
+              <h4>Seychelles</h4>
+              <p>Découvrez Seychelles.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="SOM">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Somalie" loading="lazy">
+            <div class="dest-info">
+              <h4>Somalie</h4>
+              <p>Découvrez Somalie.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="ZAF">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Afrique du Sud" loading="lazy">
+            <div class="dest-info">
+              <h4>Afrique du Sud</h4>
+              <p>Découvrez Afrique du Sud.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="TZA">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Tanzanie" loading="lazy">
+            <div class="dest-info">
+              <h4>Tanzanie</h4>
+              <p>Découvrez Tanzanie.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="UGA">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Ouganda" loading="lazy">
+            <div class="dest-info">
+              <h4>Ouganda</h4>
+              <p>Découvrez Ouganda.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="ZMB">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Zambie" loading="lazy">
+            <div class="dest-info">
+              <h4>Zambie</h4>
+              <p>Découvrez Zambie.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="ZWE">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Zimbabwe" loading="lazy">
+            <div class="dest-info">
+              <h4>Zimbabwe</h4>
+              <p>Découvrez Zimbabwe.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="BGD">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Bangladesh" loading="lazy">
+            <div class="dest-info">
+              <h4>Bangladesh</h4>
+              <p>Découvrez Bangladesh.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="KHM">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Cambodge" loading="lazy">
+            <div class="dest-info">
+              <h4>Cambodge</h4>
+              <p>Découvrez Cambodge.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="HKG">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Hong Kong" loading="lazy">
+            <div class="dest-info">
+              <h4>Hong Kong</h4>
+              <p>Découvrez Hong Kong.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="IRN">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Iran" loading="lazy">
+            <div class="dest-info">
+              <h4>Iran</h4>
+              <p>Découvrez Iran.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="LAO">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Laos" loading="lazy">
+            <div class="dest-info">
+              <h4>Laos</h4>
+              <p>Découvrez Laos.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="MAC">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Macao" loading="lazy">
+            <div class="dest-info">
+              <h4>Macao</h4>
+              <p>Découvrez Macao.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="MYS">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Malaisie" loading="lazy">
+            <div class="dest-info">
+              <h4>Malaisie</h4>
+              <p>Découvrez Malaisie.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="MDV">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Maldives" loading="lazy">
+            <div class="dest-info">
+              <h4>Maldives</h4>
+              <p>Découvrez Maldives.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="NPL">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Népal" loading="lazy">
+            <div class="dest-info">
+              <h4>Népal</h4>
+              <p>Découvrez Népal.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="PAK">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Pakistan" loading="lazy">
+            <div class="dest-info">
+              <h4>Pakistan</h4>
+              <p>Découvrez Pakistan.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="PHL">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Philippines" loading="lazy">
+            <div class="dest-info">
+              <h4>Philippines</h4>
+              <p>Découvrez Philippines.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="SGP">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Singapour" loading="lazy">
+            <div class="dest-info">
+              <h4>Singapour</h4>
+              <p>Découvrez Singapour.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="LKA">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Sri Lanka" loading="lazy">
+            <div class="dest-info">
+              <h4>Sri Lanka</h4>
+              <p>Découvrez Sri Lanka.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="TJK">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Tadjikistan" loading="lazy">
+            <div class="dest-info">
+              <h4>Tadjikistan</h4>
+              <p>Découvrez Tadjikistan.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="TLS">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Timor oriental" loading="lazy">
+            <div class="dest-info">
+              <h4>Timor oriental</h4>
+              <p>Découvrez Timor oriental.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="COK">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Îles Cook" loading="lazy">
+            <div class="dest-info">
+              <h4>Îles Cook</h4>
+              <p>Découvrez Îles Cook.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="FSM">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="États fédérés de Micronésie" loading="lazy">
+            <div class="dest-info">
+              <h4>États fédérés de Micronésie</h4>
+              <p>Découvrez États fédérés de Micronésie.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="KIR">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Kiribati" loading="lazy">
+            <div class="dest-info">
+              <h4>Kiribati</h4>
+              <p>Découvrez Kiribati.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="NIU">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Niue" loading="lazy">
+            <div class="dest-info">
+              <h4>Niue</h4>
+              <p>Découvrez Niue.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="PLW">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Palaos" loading="lazy">
+            <div class="dest-info">
+              <h4>Palaos</h4>
+              <p>Découvrez Palaos.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="WSM">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Samoa" loading="lazy">
+            <div class="dest-info">
+              <h4>Samoa</h4>
+              <p>Découvrez Samoa.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="TUV">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Tuvalu" loading="lazy">
+            <div class="dest-info">
+              <h4>Tuvalu</h4>
+              <p>Découvrez Tuvalu.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="BHS">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Bahamas" loading="lazy">
+            <div class="dest-info">
+              <h4>Bahamas</h4>
+              <p>Découvrez Bahamas.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="BRB">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Barbade" loading="lazy">
+            <div class="dest-info">
+              <h4>Barbade</h4>
+              <p>Découvrez Barbade.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="BLZ">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Belize" loading="lazy">
+            <div class="dest-info">
+              <h4>Belize</h4>
+              <p>Découvrez Belize.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="BOL">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Bolivie" loading="lazy">
+            <div class="dest-info">
+              <h4>Bolivie</h4>
+              <p>Découvrez Bolivie.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="DMA">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Dominique" loading="lazy">
+            <div class="dest-info">
+              <h4>Dominique</h4>
+              <p>Découvrez Dominique.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="ECU">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Équateur" loading="lazy">
+            <div class="dest-info">
+              <h4>Équateur</h4>
+              <p>Découvrez Équateur.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="HTI">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Haïti" loading="lazy">
+            <div class="dest-info">
+              <h4>Haïti</h4>
+              <p>Découvrez Haïti.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="NIC">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Nicaragua" loading="lazy">
+            <div class="dest-info">
+              <h4>Nicaragua</h4>
+              <p>Découvrez Nicaragua.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="VCT">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Saint-Vincent-et-les-Grenadines" loading="lazy">
+            <div class="dest-info">
+              <h4>Saint-Vincent-et-les-Grenadines</h4>
+              <p>Découvrez Saint-Vincent-et-les-Grenadines.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="SUR">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Suriname" loading="lazy">
+            <div class="dest-info">
+              <h4>Suriname</h4>
+              <p>Découvrez Suriname.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="TUN">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Tunisie" loading="lazy">
+            <div class="dest-info">
+              <h4>Tunisie</h4>
+              <p>Découvrez Tunisie.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="OMN">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Oman" loading="lazy">
+            <div class="dest-info">
+              <h4>Oman</h4>
+              <p>Découvrez Oman.</p>
+            </div>
+          </div>
+
+          <div class="dest-card" data-iso="PSE">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/1x1.png/600px-1x1.png" alt="Palestine" loading="lazy">
+            <div class="dest-info">
+              <h4>Palestine</h4>
+              <p>Découvrez Palestine.</p>
+            </div>
+          </div>
+        </div>
+        
+        <div class="hidden-msg" onclick="this.classList.toggle('revealed')">
+          <span class="teaser">Astuce voyageur 🤫 (Cliquez ici)</span>
+          <span class="actual-msg">Oublie les Maldives et Singapour. La meilleure vue du monde, c'est toi au-dessus de moi. 😈</span>
         </div>
       </div>
     </div>
